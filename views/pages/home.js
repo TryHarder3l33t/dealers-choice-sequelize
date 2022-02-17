@@ -70,7 +70,7 @@ module.exports = (results, candyCat) => htmll`<!DOCTYPE html>
         <ul class="col-5">
           ${results.map(
             (result) => htmll`<div class"col-6">
-            <a href="/detail/${result.categoryId}">
+            <a href="/detail/${result.id}">
              <img
               src='${result.image}'
               class="img-fluid"
