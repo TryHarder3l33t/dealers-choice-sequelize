@@ -8,9 +8,22 @@ console.log(`"\u001b[1;42m" ${Date().toString()} "\u001b[0m"`);
 //Sequelize setup
 //
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize(
-  process.env.DATABASE_URL || "postgresql://ericrodgers@localhost/sweetstore"
-);
+//Deployment
+var sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+});
+// //development
+// const sequelize = new Sequelize(
+//   process.env.DATABASE_URL ||
+//     "postgresql://ericrodgers@localhost/acme_country_club"
+// );
+
 //Connection Test
 const test = async () => {
   try {
