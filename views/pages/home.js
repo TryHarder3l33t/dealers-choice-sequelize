@@ -14,8 +14,12 @@ module.exports = (results, candyCat) => htmll`<!DOCTYPE html>
 
     <body>
     <div class="container">
-    <div class= "col-3">
-       <form class="row g-3" method="post" action="/candyshop">
+    <div class= "">
+    <div>
+    <h2>Make a Candy</h2>
+    <div class="col-5">
+
+    <form class="row g-3" method="post" action="/candyshop?categoryId=">
   
   <div class="col-12">
     <label for="inputAddress" class="form-label">Image Url</label>
@@ -31,12 +35,10 @@ module.exports = (results, candyCat) => htmll`<!DOCTYPE html>
     <label for="inputCity" class="form-label">Price</label>
     <input type="text" class="form-control" id="inputCity" placeholder="3.00" name="price">
   </div>
-
   <div class="col-md-8">
     <label for="inputState" class="form-label">Category</label>
-    <select id="inputState" class="form-select">
+    <select id="inputState" class="form-select" name="categoryId">
       <option selected>Category</option>
-     
       ${candyCat.map(
         (cat) => htmll`
         <option value ="${cat.id}">${cat.name}</option>
@@ -45,26 +47,43 @@ module.exports = (results, candyCat) => htmll`<!DOCTYPE html>
       )}
     </select>
   </div>
- 
- 
   <div class="col-12">
     <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
+
     </div>
 
  
         <div >
+        <div class="col-md-8">
+      
+   
+  </div>
+  <h3>Shop by category</h3>
+  ${candyCat.map(
+    (cat) => htmll`<a href='/category/${cat.id}'>
+    <p value ="${cat.id}">${cat.name}</p>
+    </a>    
+    `
+  )}
         <ul class="col-5">
           ${results.map(
             (result) => htmll`<div class"col-6">
-              <img
+            <a href="/detail/${result.categoryId}">
+             <img
               src='${result.image}'
               class="img-fluid"
               alt="..."
             />
+            </a>
+             
               <li>${result.name}</li>
               <li>${result.price}</li>
+              <form method="POST" action="/candyshop/delete/${result.id}?_method=delete">
+              <button> DELETE</button>
+  </form>
+  <br>
               <br />
             </div>`
           )}
@@ -77,6 +96,3 @@ module.exports = (results, candyCat) => htmll`<!DOCTYPE html>
       
     </body>
   </html>`;
-
-//   <option value="2">Two</option>
-//   <option value="3">Three</option>

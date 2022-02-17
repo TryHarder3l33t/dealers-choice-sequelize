@@ -8,21 +8,21 @@ console.log(`"\u001b[1;42m" ${Date().toString()} "\u001b[0m"`);
 //Sequelize setup
 //
 const Sequelize = require("sequelize");
-//Deployment
-var sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
-});
-// //development
-// const sequelize = new Sequelize(
-//   process.env.DATABASE_URL ||
-//     "postgresql://ericrodgers@localhost/acme_country_club"
-// );
+// //Deployment
+// var sequelize = new Sequelize(process.env.DATABASE_URL, {
+//   dialect: "postgres",
+//   dialectOptions: {
+//     ssl: {
+//       require: true,
+//       rejectUnauthorized: false,
+//     },
+//   },
+// });
+//development
+const sequelize = new Sequelize(
+  process.env.DATABASE_URL ||
+    "postgresql://ericrodgers@localhost/acme_country_club"
+);
 
 //Connection Test
 const test = async () => {
@@ -44,6 +44,8 @@ const express = require("express");
 const app = express();
 
 const home = require("./views/pages/home.js");
+const category = require("./views/pages/category");
+const detail = require("./views/pages/detail.js");
 const PORT = process.env.PORT || 2800;
 app.listen(PORT, function () {
   console.log(`Express is listening on ${PORT}`);
@@ -193,14 +195,23 @@ go();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use((req, res, next) => {
+  if (req.method === "POST" && req.query._method) {
+    req.method = req.query._method;
+  }
+  next();
+});
+
 app.post("/candyshop", async (req, res) => {
   try {
     console.log(req.body);
     const candy = await Candy.create(req.body);
+    res.redirect("/candyshop");
   } catch (error) {
     console.log(error);
   }
 });
+
 app.get("/", (req, res) => {
   res.redirect("/candyshop");
 });
@@ -214,9 +225,32 @@ app.get("/candyshop", async (req, res) => {
     console.log(error);
   }
 });
-
-app.post("/candyshop", async (req, res) => {
+app.get("/category/:id", async (req, res) => {
   try {
+    const reqCandyId = req.params.id;
+    const candies = await Candy.findAll({
+      where: {
+        categoryId: reqCandyId,
+      },
+    });
+    res.send(category(candies));
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/detail/:id", async (req, res) => {
+  const candyId = req.params.id;
+  const candy = await Candy.findByPk(candyId);
+  res.send(detail(candy));
+});
+
+app.delete("/candyshop/delete/:id", async (req, res) => {
+  try {
+    const candy = await Candy.findByPk(req.params.id);
+    await candy.destroy();
+
+    res.redirect("/");
   } catch (error) {
     console.log(error);
   }
